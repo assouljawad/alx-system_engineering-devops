@@ -1,1 +1,2 @@
-REASDME
+#!/bin/bash
+sudo su betty
