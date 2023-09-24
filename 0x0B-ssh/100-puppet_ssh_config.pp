@@ -1,8 +1,11 @@
-# make changes in SSH configuration file
+# This puppet file configures the SSH config
+file_line { 'Refuse password authentication':
+  path  => '~/.ssh/config',
+  line  => 'KbdInteractiveAuthentication no',
+  match => 'KbdInteractiveAuthentication yes',
+}
 
-
-file_line { 'Turn off passwd auth':
-  path   => '/etc/ssh/jawad',
-  line   => '    PasswordAuthentication no',
-  match   => '^PasswordAuthentication',
-  }
+file_line { 'Specify identity file':
+  path  => '~/.ssh/config',
+  line  => 'IdentityFile ~/.ssh/holberton',
+}
