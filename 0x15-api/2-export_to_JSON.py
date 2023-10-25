@@ -26,4 +26,5 @@ if __name__ == "__main__":
 
     d_task = {str(userid): l_task}
     filename = '{}.json'.format(userid)
-    with open(filename, mode='w') as f: json.dump(d_task, f)
+    with open(filename, mode='w') as f:
+        json.dump(d_task, f)
