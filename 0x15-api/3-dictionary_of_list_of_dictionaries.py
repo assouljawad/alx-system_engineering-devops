@@ -1,31 +1,29 @@
 #!/usr/bin/python3
-""" Script that uses JSONPlaceholder API to get information about employee """
+"""script to export data in the JSON format.
+"""
+
 import json
 import requests
-import sys
 
 
-if __name__ == "__main__":
-    url = 'https://jsonplaceholder.typicode.com/'
-    user = '{}users'.format(url)
-    res = requests.get(user)
-    json_o = res.json()
-    d_task = {}
-    for user in json_o:
-        name = user.get('username')
-        userid = user.get('id')
-        todos = '{}todos?userId={}'.format(url, userid)
-        res = requests.get(todos)
-        tasks = res.json()
-        l_task = []
-        for task in tasks:
-            dict_task = {"username": name,
-                         "task": task.get('title'),
-                         "completed": task.get('completed')}
-            l_task.append(dict_task)
+if __name__ == '__main__':
+    """ """
+    base_url = 'https://jsonplaceholder.typicode.com/'
+    EMPLOYEE_NAME = requests.get(
+        '{}users'.format(base_url)).json()
 
-        d_task[str(userid)] = l_task
-    filename = 'todo_all_employees.json'
-    with open(filename, mode='w') as f:
-        json.dump(d_task, f)
-        
+    TODOS = requests.get(
+        '{}todos'.format(base_url)).json()
+
+    with open('todo_all_employees.json', 'w', newline='') as jsonfile:
+        obj = {}
+        for todos in TODOS:
+            i = todos.get('userId')
+            dct = {}
+            if i not in obj:
+                obj[i] = []
+            dct['username'] = EMPLOYEE_NAME[i-1].get('username')
+            dct['task'] = todos.get('title')
+            dct['completed'] = todos.get('completed')
+            obj[i].append(dct)
+        json.dump(obj, jsonfile)
