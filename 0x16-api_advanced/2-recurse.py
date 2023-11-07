@@ -1,29 +1,45 @@
 #!/usr/bin/python3
-"""model that queries the Reddit API and prints the titles
-of the first 10 hot posts listed for a given subreddit."""
+"""
+Function that queries the Reddit API and prints
+the top ten hot posts of a subreddit
+"""
 import requests
+import sys
+
+
+def add_title(hot_list, hot_posts):
+    """ Adds item into a list """
+    if len(hot_posts) == 0:
+        return
+    hot_list.append(hot_posts[0]['data']['title'])
+    hot_posts.pop(0)
+    add_title(hot_list, hot_posts)
 
 
 def recurse(subreddit, hot_list=[], after=None):
-    """send get http req to Reddit API and returns 10 hot posts titels"""
+    """ Queries to Reddit API """
+    u_agent = 'Mozilla/5.0'
+    headers = {
+        'User-Agent': u_agent
+    }
 
-    if subreddit is None:
+    params = {
+        'after': after
+    }
+
+    url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
+    res = requests.get(url,
+                       headers=headers,
+                       params=params,
+                       allow_redirects=False)
+
+    if res.status_code != 200:
         return None
 
-    data = requests.get("https://www.reddit.com/r/{}/hot.json?after={}"
-                        .format(subreddit, after),
-                        headers={"User-Agent": "My-User-Agent"},
-                        allow_redirects=False)
-    if data.status_code != 200:
-        return None
-
-    titels = data.json()["data"]["children"]
-    for title in titels:
-        hot_list.append(title.get('data').get('title'))
-
-    the_after = data.json()["data"]["after"]
-
-    if not the_after:
+    dic = res.json()
+    hot_posts = dic['data']['children']
+    add_title(hot_list, hot_posts)
+    after = dic['data']['after']
+    if not after:
         return hot_list
-    else:
-        return recurse(subreddit, hot_list, after=the_after)
+    return recurse(subreddit, hot_list=hot_list, after=after)
